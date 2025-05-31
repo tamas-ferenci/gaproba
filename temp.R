@@ -44,7 +44,7 @@ repeat {
 
 maxv <- i - 1
 
-print(str(rvest::read_html(paste0(elviraurl, 1, "&d=", datum, "&ed=", EDszam))))
+print(rvest::read_html(paste0(elviraurl, 1, "&d=", datum, "&ed=", EDszam)))
 
 cl <- parallel::makeCluster(2)
 # cl <- parallel::makeCluster(parallel::detectCores() - 1)
