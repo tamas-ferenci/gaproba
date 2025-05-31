@@ -1,8 +1,6 @@
 library(data.table)
 
 print("elso")
-elviraurl <- "https://elvira.mav-start.hu/elvira.dll/x/vt?v="
-print(str(rvest::read_html(paste0(elviraurl, 1, "&d=", datum, "&ed=", EDszam))))
 
 EDszam <- rvest::read_html("https://elvira.mav-start.hu/")
 EDszam <- rvest::html_text(rvest::html_nodes(EDszam, "script"))
@@ -13,7 +11,7 @@ EDszam <- EDszam[[which(sapply(EDszam, length) > 0)]]
 
 datum <- format(Sys.Date(), "%y.%m.%d")
 
-
+elviraurl <- "https://elvira.mav-start.hu/elvira.dll/x/vt?v="
 
 i <- 1000
 repeat {
@@ -45,6 +43,8 @@ repeat {
 }
 
 maxv <- i - 1
+
+print(str(rvest::read_html(paste0(elviraurl, 1, "&d=", datum, "&ed=", EDszam))))
 
 cl <- parallel::makeCluster(2)
 # cl <- parallel::makeCluster(parallel::detectCores() - 1)
