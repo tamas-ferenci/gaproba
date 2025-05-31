@@ -50,7 +50,7 @@ cl <- parallel::makeCluster(2)
 # cl <- parallel::makeCluster(parallel::detectCores() - 1)
 parallel::clusterExport(cl, c("datum", "EDszam"))
 
-res <- parallel::parLapply(cl, 1:maxv, function(v) {
+res <- lapply(1:maxv, function(v) {
   pg <- purrr::insistently(function() rvest::read_html(paste0(
     elviraurl, v, "&d=", datum, "&ed=", EDszam)),
     rate = purrr::rate_delay(pause = 2, max_times = 10))()
