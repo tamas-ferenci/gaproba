@@ -44,13 +44,16 @@ repeat {
 
 maxv <- i - 1
 
-print(rvest::read_html(paste0(elviraurl, 1, "&d=", datum, "&ed=", EDszam)))
+print(maxv)
+print(EDszam)
+print(datum)
 
-cl <- parallel::makeCluster(2)
+# cl <- parallel::makeCluster(2)
 # cl <- parallel::makeCluster(parallel::detectCores() - 1)
-parallel::clusterExport(cl, c("datum", "EDszam"))
+# parallel::clusterExport(cl, c("datum", "EDszam"))
 
 res <- lapply(1:maxv, function(v) {
+  print(v)
   pg <- purrr::insistently(function() rvest::read_html(paste0(
     elviraurl, v, "&d=", datum, "&ed=", EDszam)),
     rate = purrr::rate_delay(pause = 2, max_times = 10))()
@@ -63,7 +66,7 @@ res <- lapply(1:maxv, function(v) {
           pg, xpath = "//div[@id='tul']/h2")))
 })
 
-parallel::stopCluster(cl)
+# parallel::stopCluster(cl)
 
 res <- rbindlist(res, fill = TRUE)
 
