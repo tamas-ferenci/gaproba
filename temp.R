@@ -1,6 +1,7 @@
 library(data.table)
 
 print("elso")
+print(str(rvest::read_html(paste0(elviraurl, 1, "&d=", datum, "&ed=", EDszam))))
 
 EDszam <- rvest::read_html("https://elvira.mav-start.hu/")
 EDszam <- rvest::html_text(rvest::html_nodes(EDszam, "script"))
