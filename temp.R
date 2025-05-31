@@ -1,5 +1,7 @@
 library(data.table)
 
+print("elso")
+
 EDszam <- rvest::read_html("https://elvira.mav-start.hu/")
 EDszam <- rvest::html_text(rvest::html_nodes(EDszam, "script"))
 EDszam <- sapply(EDszam, function(s)
