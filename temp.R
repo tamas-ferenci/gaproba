@@ -48,7 +48,7 @@ print(datum)
 
 pb <- progress::progress_bar$new(
   format = "  downloading [:bar] :current/:total (:percent) in :elapsedfull eta: :eta",
-  total = maxv, clear = FALSE)
+  total = maxv, force = TRUE, clear = FALSE)
 pb$tick(0)
 
 # cl <- parallel::makeCluster(2)
