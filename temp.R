@@ -76,4 +76,4 @@ res <- lapply(1:maxv, function(v) {
 
 res <- rbindlist(res, fill = TRUE)
 
-saveRDS(res, "res.RDS")
+saveRDS(res, "res.rds")
