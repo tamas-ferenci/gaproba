@@ -1,5 +1,3 @@
-library(data.table)
-
 print(Sys.Date())
 print(Sys.time())
 
@@ -14,43 +12,24 @@ datum <- format(Sys.Date(), "%y.%m.%d")
 
 elviraurl <- "https://elvira.mav-start.hu/elvira.dll/x/vt?v="
 
-i <- 1000
-repeat {
-  tab <- rvest::html_table(rvest::read_html(paste0(
-    elviraurl, i, "&d=", datum, "&ed=", EDszam)))
-  if(length(tab) == 0) break
-  i <- i + 1000
+maxv <- 1000
+for(d in c(1000, 100, 10, 1)) {
+  repeat {
+    tab <- rvest::html_table(rvest::read_html(paste0(
+      elviraurl, maxv, "&d=", datum, "&ed=", EDszam)))
+    if(length(tab) == 0) break
+    maxv <- maxv + d
+  }
+  maxv <- maxv - d
 }
-i <- i - 1000
-repeat {
-  tab <- rvest::html_table(rvest::read_html(paste0(
-    elviraurl, i, "&d=", datum, "&ed=", EDszam)))
-  if(length(tab) == 0) break
-  i <- i + 100
-}
-i <- i - 100
-repeat {
-  tab <- rvest::html_table(rvest::read_html(paste0(
-    elviraurl, i, "&d=", datum, "&ed=", EDszam)))
-  if(length(tab) == 0) break
-  i <- i + 10
-}
-i <- i - 10
-repeat {
-  tab <- rvest::html_table(rvest::read_html(paste0(
-    elviraurl, i, "&d=", datum, "&ed=", EDszam)))
-  if(length(tab) == 0) break
-  i <- i + 1
-}
-
-maxv <- i - 1
 
 print(maxv)
 print(EDszam)
 print(datum)
 
 pb <- progress::progress_bar$new(
-  format = "  downloading [:bar] :current/:total (:percent) in :elapsedfull eta: :eta",
+  format = paste0("  downloading [:bar] :current/:total ",
+                  "(:percent) in :elapsedfull eta: :eta"),
   total = maxv, force = TRUE, clear = FALSE)
 pb$tick(0)
 
@@ -74,6 +53,4 @@ res <- lapply(1:maxv, function(v) {
 
 # parallel::stopCluster(cl)
 
-res <- rbindlist(res, fill = TRUE)
-
-saveRDS(res, "res.rds")
+save(res, "res.rds")
