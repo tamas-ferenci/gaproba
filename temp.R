@@ -53,4 +53,4 @@ res <- lapply(1:maxv, function(v) {
 
 # parallel::stopCluster(cl)
                  
-saveRDS(res, "res.RDS")
+saveRDS(res, "res.rds")
