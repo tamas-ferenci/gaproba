@@ -44,7 +44,7 @@ res <- lapply(1:maxv, function(v) {
   tab <- if(tab$X1[3] == "Km") tab[-c(1, 3),] else tab[-2,]
   cbind(setNames(tab[-1,], make.names(as.character(tab[1,]),
                                       unique = TRUE)),
-        Datum = format(datum, "%y.%m.%d"), Vonat = v,
+        Datum = as.Date(datum, format = "%y.%m.%d"), Vonat = v,
         VonatSzam = rvest::html_text(rvest::html_nodes(
           pg, xpath = "//div[@id='tul']/h2")))
 })
@@ -75,7 +75,8 @@ tdiff <- function(x, y) {
   dplyr::if_else(temp < -720, temp + 1440, temp)
 }
 
-res[tdiff(Tényleges, Tényleges.1) < 0, c("Tényleges", "Tényleges.1") := list(NA, NA)]
+res[tdiff(Tényleges, Tényleges.1) < 0,
+    c("Tényleges", "Tényleges.1") := list(NA, NA)]
 
 res2 <- res[, rbind(
   .SD[1, .(KmIndulo = Km, KmErkezo = Km, Indulo = Állomás,
@@ -84,42 +85,55 @@ res2 <- res[, rbind(
            KumTenyleges = tdiff(Menetrend.szerint.1, Tényleges.1),
            Tipus = "InduloAllomas", Order = 1)],
   .SD[, .(KmIndulo = Km[-length(Km)], KmErkezo = Km[-1],
-          Indulo = Állomás[-length(Állomás)], Erkezo = Állomás[-1],
-          Nominalis = tdiff(Menetrend.szerint.1[-length(Menetrend.szerint.1)], Menetrend.szerint[-1]),
-          KumNominalis = tdiff(Menetrend.szerint.1[1], Menetrend.szerint[-1]),
-          Tenyleges = tdiff(Tényleges.1[-length(Tényleges.1)], Tényleges[-1]),
-          KumTenyleges = tdiff(Menetrend.szerint.1[1], Tényleges[-1]),
+          Indulo = Állomás[-length(Állomás)],
+          Erkezo = Állomás[-1],
+          Nominalis = tdiff(Menetrend.szerint.1[
+            -length(Menetrend.szerint.1)], Menetrend.szerint[-1]),
+          KumNominalis = tdiff(Menetrend.szerint.1[1],
+                               Menetrend.szerint[-1]),
+          Tenyleges = tdiff(Tényleges.1[-length(Tényleges.1)],
+                            Tényleges[-1]),
+          KumTenyleges = tdiff(Menetrend.szerint.1[1],
+                               Tényleges[-1]),
           Tipus = c(rep("Szakasz", .N - 2), "ZaroSzakasz"),
           Order = seq(2, by = 2, length.out = .N - 1))],
-  .SD[, .(KmIndulo = Km[-c(1, .N)], KmErkezo = Km[-c(1, .N)], Indulo = Állomás[-c(1, .N)],
+  .SD[, .(KmIndulo = Km[-c(1, .N)], KmErkezo = Km[-c(1, .N)],
+          Indulo = Állomás[-c(1, .N)],
           Erkezo = Állomás[-c(1, .N)],
-          Nominalis = tdiff(Menetrend.szerint[-c(1, .N)], Menetrend.szerint.1[-c(1, .N)]),
-          KumNominalis = tdiff(Menetrend.szerint.1[1], Menetrend.szerint.1[-c(1, .N)]),
-          Tenyleges = tdiff(Tényleges[-c(1, .N)], Tényleges.1[-c(1, .N)]),
-          KumTenyleges = tdiff(Menetrend.szerint.1[1], Tényleges.1[-c(1, .N)]),
+          Nominalis = tdiff(Menetrend.szerint[-c(1, .N)],
+                            Menetrend.szerint.1[-c(1, .N)]),
+          KumNominalis = tdiff(Menetrend.szerint.1[1],
+                               Menetrend.szerint.1[-c(1, .N)]),
+          Tenyleges = tdiff(Tényleges[-c(1, .N)],
+                            Tényleges.1[-c(1, .N)]),
+          KumTenyleges = tdiff(Menetrend.szerint.1[1],
+                               Tényleges.1[-c(1, .N)]),
           Tipus = "KozbensoAllomas",
-          Order = seq(3, by = 2, length.out = .N - 2))])[order(Order)], .(Datum, Vonat, VonatSzam)]
+          Order = seq(3, by = 2, length.out = .N - 2))])[
+            order(Order)], .(Datum, Vonat, VonatSzam)]
 
 res2$Keses <- res2$Tenyleges - res2$Nominalis
 res2$KumKeses <- res2$KumTenyleges - res2$KumNominalis
 
+qgrepl <- function(x) grepl(x, res2$VonatSzam, ignore.case = TRUE)
+
 res2$VonatJelleg <- dplyr::case_when(
-  grepl("személyvonat", res2$VonatSzam, ignore.case = TRUE) ~ "Személyvonat",
-  grepl("InterCity", res2$VonatSzam, ignore.case = TRUE) ~ "InterCity",
-  grepl("InterRégió", res2$VonatSzam, ignore.case = TRUE) ~ "InterRégió",
-  grepl("vonatpótló autóbusz", res2$VonatSzam, ignore.case = TRUE) ~ "Vonatpótló autóbusz",
-  grepl("railjet xpress", res2$VonatSzam, ignore.case = TRUE) ~ "Railjet xpress",
-  grepl("railjet", res2$VonatSzam, ignore.case = TRUE) ~ "Railjet",
-  grepl("gyorsvonat", res2$VonatSzam, ignore.case = TRUE) ~ "Gyorsvonat",
-  grepl("TramTrain", res2$VonatSzam, ignore.case = TRUE) ~ "TramTrain",
-  grepl("Expresszvonat", res2$VonatSzam, ignore.case = TRUE) ~ "Expresszvonat",
-  grepl("sebesvonat", res2$VonatSzam, ignore.case = TRUE) ~ "Sebesvonat",
-  grepl("EuroCity", res2$VonatSzam, ignore.case = TRUE) ~ "EuroCity",
-  grepl("EuRegio", res2$VonatSzam, ignore.case = TRUE) ~ "EuRegio",
-  grepl("EuroNight", res2$VonatSzam, ignore.case = TRUE) ~ "EuroNight",
-  grepl("Night Jet", res2$VonatSzam, ignore.case = TRUE) ~ "Night Jet",
-  grepl("Interregional", res2$VonatSzam, ignore.case = TRUE) ~ "Interregional",
-  grepl("International", res2$VonatSzam, ignore.case = TRUE) ~ "International",
+  qgrepl("személyvonat") ~ "Személyvonat",
+  qgrepl("InterCity") ~ "InterCity",
+  qgrepl("InterRégió") ~ "InterRégió",
+  qgrepl("vonatpótló autóbusz") ~ "Vonatpótló autóbusz",
+  qgrepl("railjet xpress") ~ "Railjet xpress",
+  qgrepl("railjet") ~ "Railjet",
+  qgrepl("gyorsvonat") ~ "Gyorsvonat",
+  qgrepl("TramTrain") ~ "TramTrain",
+  qgrepl("Expresszvonat") ~ "Expresszvonat",
+  qgrepl("sebesvonat") ~ "Sebesvonat",
+  qgrepl("EuroCity") ~ "EuroCity",
+  qgrepl("EuRegio") ~ "EuRegio",
+  qgrepl("EuroNight") ~ "EuroNight",
+  qgrepl("Night Jet") ~ "Night Jet",
+  qgrepl("Interregional") ~ "Interregional",
+  qgrepl("International") ~ "International",
   .default = "Egyéb"
 )
 
