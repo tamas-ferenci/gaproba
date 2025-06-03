@@ -47,4 +47,5 @@ res <- lapply(1:maxv, function(v) {
           pg, xpath = "//div[@id='tul']/h2")))
 })
 
-saveRDS(res, paste0("raw/raw", format(Sys.Date(), "%Y%m%d"), ".rds"))
+saveRDS(res, paste0("raw/raw", format(Sys.Date(), "%Y%m%d"),
+                    ".rds"))
