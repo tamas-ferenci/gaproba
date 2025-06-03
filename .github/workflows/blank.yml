@@ -42,6 +42,8 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add raw/temp.rds
-          git commit -m 'Data updated' || echo "No changes to commit"
+          git add raw/raw*.rds
+          git commit -m 'Raw data updated' || echo "No changes to commit"
+          git add proc/prco*.rds
+          git commit -m 'Processed data updated' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
