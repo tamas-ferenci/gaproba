@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run analysis
-        run: Rscript -e 'source("temp.R")'
+        run: Rscript -e 'source("scrape.R")'
 
       - name: Commit results
         run: |
