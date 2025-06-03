@@ -33,10 +33,6 @@ pb <- progress::progress_bar$new(
   total = maxv, force = TRUE, clear = FALSE)
 pb$tick(0)
 
-# cl <- parallel::makeCluster(2)
-# cl <- parallel::makeCluster(parallel::detectCores() - 1)
-# parallel::clusterExport(cl, c("datum", "EDszam"))
-
 res <- lapply(1:maxv, function(v) {
   pb$tick()
   pg <- purrr::insistently(function() rvest::read_html(paste0(
@@ -51,6 +47,4 @@ res <- lapply(1:maxv, function(v) {
           pg, xpath = "//div[@id='tul']/h2")))
 })
 
-# parallel::stopCluster(cl)
-                 
-saveRDS(res, paste0("res", format(Sys.Date(), "%Y%m%d"), ".rds"))
+saveRDS(res, paste0("raw/raw", format(Sys.Date(), "%Y%m%d"), ".rds"))
