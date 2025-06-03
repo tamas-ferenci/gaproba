@@ -35,7 +35,7 @@ pb <- progress::progress_bar$new(
   total = maxv, force = TRUE, clear = FALSE)
 pb$tick(0)
 
-res <- lapply(1:10, function(v) {
+res <- lapply(1:maxv, function(v) {
   pb$tick()
   pg <- purrr::insistently(function() rvest::read_html(paste0(
     elviraurl, v, "&d=", datum, "&ed=", EDszam)),
